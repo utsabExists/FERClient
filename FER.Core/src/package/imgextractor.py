@@ -5,12 +5,46 @@ import numpy as np
 import os
 from deepface import DeepFace
 import matplotlib.pyplot as plt
+from package.fersettings import FerSettings
 
-def CaptureFromVideo(videofile, outputDir) :
-    imageCapturethrottleLimit = 4
+# cv2 Camera Properties
+# 0. CV_CAP_PROP_POS_MSEC Current position of the video file in milliseconds.
+# 1. CV_CAP_PROP_POS_FRAMES 0-based index of the frame to be decoded/captured next.
+# 2. CV_CAP_PROP_POS_AVI_RATIO Relative position of the video file
+# 3. CV_CAP_PROP_FRAME_WIDTH Width of the frames in the video stream.
+# 4. CV_CAP_PROP_FRAME_HEIGHT Height of the frames in the video stream.
+# 5. CV_CAP_PROP_FPS Frame rate.
+# 6. CV_CAP_PROP_FOURCC 4-character code of codec.
+# 7. CV_CAP_PROP_FRAME_COUNT Number of frames in the video file.
+# 8. CV_CAP_PROP_FORMAT Format of the Mat objects returned by retrieve() .
+# 9. CV_CAP_PROP_MODE Backend-specific value indicating the current capture mode.
+# 10. CV_CAP_PROP_BRIGHTNESS Brightness of the image (only for cameras).
+# 11. CV_CAP_PROP_CONTRAST Contrast of the image (only for cameras).
+# 12. CV_CAP_PROP_SATURATION Saturation of the image (only for cameras).
+# 13. CV_CAP_PROP_HUE Hue of the image (only for cameras).
+# 14. CV_CAP_PROP_GAIN Gain of the image (only for cameras).
+# 15. CV_CAP_PROP_EXPOSURE Exposure (only for cameras).
+# 16. CV_CAP_PROP_CONVERT_RGB Boolean flags indicating whether images should be converted to RGB.
+# 17. CV_CAP_PROP_WHITE_BALANCE Currently unsupported
+# 18. CV_CAP_PROP_RECTIFICATION Rectification flag for stereo cameras (note: only supported by DC1394 v 2.x backend currently)
+
+
+def GetFrameRate(videoParam) :
+    # Find OpenCV version
+    (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
+    if int(major_ver)  < 3 :
+        fps = videoParam.get(cv2.cv.CV_CAP_PROP_FPS)
+        print ("Frames per second using video.get(cv2.cv.CV_CAP_PROP_FPS): {0}".format(fps))
+    else :
+        fps = videoParam.get(cv2.CAP_PROP_FPS)
+        print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
+
+    return int(fps)
+
+def CaptureFromVideo(videofile, outputDir, fersettings) :
     # Read the video from specified path 
     cam = cv2.VideoCapture(videofile) 
-    
+    fps = GetFrameRate(cam)
     try: 
         
         # creating a folder named data 
@@ -24,7 +58,7 @@ def CaptureFromVideo(videofile, outputDir) :
     
     # frame 
     currentframe = 0
-    
+    currentSec = 0
     while(True): 
         
         # reading from frame 
@@ -32,7 +66,7 @@ def CaptureFromVideo(videofile, outputDir) :
     
         if ret: 
             # if video is still left continue creating images
-            name = 'frame' + str(currentframe) + '.jpg'
+            name = 'frame_' + str(int(currentSec)) + '.jpg'
             filename = os.path.join(outputDir, name)
             print ('Creating...' + name) 
     
@@ -41,41 +75,19 @@ def CaptureFromVideo(videofile, outputDir) :
     
             # increasing counter so that it will 
             # show how many frames are created 
-            currentframe += 1
+            currentframe += (fps * fersettings.VideoCaptureIntervalInSecs())
+            currentSec += fersettings.VideoCaptureIntervalInSecs()
+            cam.set(1, currentframe)
         else: 
             break
 
-        if (imageCapturethrottleLimit == currentframe) :
+        if (currentframe == fersettings.FrameCaptureThrottleLimitPerVideo()) :
             break
     
     # Release all space and windows once done 
     cam.release() 
     cv2.destroyAllWindows()
     return True
-
-#videofile = "C:\\github\\FERClient\\data\\sample2.mp4"
-#CaptureFromVideo(videofile)
-
-# directory = ".\gen-temp"
-# listOp = []
-# for filename in os.listdir(directory):
-#     if filename.endswith(".jpg") or filename.endswith(".png"):
-#         imgfile = os.path.join(directory, filename)
-#         if (os.path.isfile(imgfile)) :
-#             print("Processing : ---------------" + imgfile + "---------------------")
-#             img = cv2.imread(imgfile)
-#             plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-#             predictions = DeepFace.analyze(img)
-#             listOp.append(predictions['dominant_emotion'])
-#     else:
-#         continue
-
-# img = cv2.imread("./gen-temp/frame0.jpg")
-# print('before showing image')
-# plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-# print('after showing image')
-# predictions = DeepFace.analyze(img)
-# print(predictions['dominant_emotion'])
 
 
 

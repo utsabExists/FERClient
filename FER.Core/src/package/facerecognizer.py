@@ -6,6 +6,17 @@ from deepface import DeepFace
 import matplotlib.pyplot as plt
 import json
 
+def GetElapsedTimeFromImgName(filename) :
+    tokens = filename.split('_')
+    if (len(tokens) != 2) :
+        return 'N/A'
+
+    lasttoken = tokens[1].split('.')
+    if (len(lasttoken) != 2) :
+        return 'N/A'
+
+    return lasttoken[0]
+
 def AnalyzeImage(imageDirectory) :
 
     listOp = []
@@ -17,7 +28,8 @@ def AnalyzeImage(imageDirectory) :
                 img = cv2.imread(imgfile)
                 plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
                 predictions = DeepFace.analyze(img)
-                result = (filename, predictions['dominant_emotion'])
+                elapsedTimeInSecs = GetElapsedTimeFromImgName(filename)
+                result = (filename, elapsedTimeInSecs, predictions['dominant_emotion'])
                 listOp.append(result)
         else:
             continue
@@ -35,7 +47,8 @@ def WriteToOutputFile(listOp, outputFile) :
     for item in listOp :
         data['Results'].append({
             'ImgName': item[0],
-            'Expression': item[1],
+            'TimeInSecs':item[1],
+            'Expression': item[2],
             })
 
     with open(outputFile, 'w') as outfile:
