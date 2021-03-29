@@ -1,4 +1,4 @@
-# importing the required packages 
+#!/usr/bin/env python3
 import pyautogui 
 import cv2 
 import numpy as np

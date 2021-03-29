@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import pyautogui 
 import cv2 
 import numpy as np
@@ -36,13 +37,9 @@ def AnalyzeImage(imageDirectory) :
     return listOp
 
 def WriteToOutputFile(listOp, outputFile) :
-    # listOp is expected to have tuple items  like [imagename, expression]
+    # listOp is expected to have tuple items  like [imagename, timestamp, expression]
     data = {}
     data['Results'] = []
-    # NOTE : if file already exists it will be overriden
-    # if (os.path.exists(filename)) :
-    #     with open(filename) as json_file:
-    #         data = json.load(json_file)
 
     for item in listOp :
         data['Results'].append({
