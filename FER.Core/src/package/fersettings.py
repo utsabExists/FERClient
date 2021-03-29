@@ -3,7 +3,7 @@ import os,sys
 
 class FerSettings :
     def __init__(self) :
-        self.videoCaptureIntervalInSecs = 1
+        self.videoCaptureIntervalInSecs = 10
         self.frameCaptureThrottleLimit = 10000
 
     def VideoCaptureIntervalInSecs(self) :
