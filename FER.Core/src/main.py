@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os, sys
 from package.fersettings import FerSettings
 
@@ -17,7 +18,8 @@ def GetOutputDirName(filepath) :
     dirPath = os.path.join(rootpath, dirName)
     return dirPath
 
-res, videopath = GetVideoFilePathFromArgs(sys.argv)
+#res, videopath = "C:\\github\\FERClient\\data\\sample4.mp4"#GetVideoFilePathFromArgs(sys.argv)
+videopath = "C:\\github\\FERClient\\data\\sample4.mp4"#GetVideoFilePathFromArgs(sys.argv)
 outputDirPath = GetOutputDirName(videopath)
 print(outputDirPath)
 

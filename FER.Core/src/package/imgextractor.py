@@ -66,8 +66,12 @@ def CaptureFromVideo(videofile, outputDir, fersettings) :
     
         if ret: 
             # if video is still left continue creating images
-            name = 'frame_' + str(int(currentSec)) + '.jpg'
-            filename = os.path.join(outputDir, name)
+            name = 'frame_' + str(int(currentSec))
+            imgdir = os.path.join(outputDir, name)
+            if (not os.path.isdir(imgdir)) :
+                os.mkdir(imgdir)
+
+            filename = os.path.join(imgdir, 'faces.jpg')
             print ('Creating...' + name) 
     
             # writing the extracted images 
@@ -85,7 +89,7 @@ def CaptureFromVideo(videofile, outputDir, fersettings) :
             break
     
     # Release all space and windows once done 
-    cam.release() 
+    cam.release()
     cv2.destroyAllWindows()
     return True
 

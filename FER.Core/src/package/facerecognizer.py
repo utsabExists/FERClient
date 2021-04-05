@@ -6,32 +6,46 @@ import os
 from deepface import DeepFace
 import matplotlib.pyplot as plt
 import json
+from package.imageObject import imageObject
+from package.imageObject import faceObject
 
 def GetElapsedTimeFromImgName(filename) :
     tokens = filename.split('_')
     if (len(tokens) != 2) :
         return 'N/A'
 
-    lasttoken = tokens[1].split('.')
-    if (len(lasttoken) != 2) :
-        return 'N/A'
-
-    return lasttoken[0]
+    return tokens[1]
 
 def AnalyzeImage(imageDirectory) :
-
     listOp = []
-    for filename in os.listdir(imageDirectory):
-        if filename.endswith(".jpg") or filename.endswith(".png"):
-            imgfile = os.path.join(imageDirectory, filename)
+    print ("Process images files")
+    index = 0
+    for dirname in os.listdir(imageDirectory):
+        dirpath = os.path.join(imageDirectory, dirname)
+        if os.path.isdir(dirpath):
+            imgfile = os.path.join(dirpath, 'faces.jpg')
             if (os.path.isfile(imgfile)) :
                 print("Processing : ---------------" + imgfile + "---------------------")
-                img = cv2.imread(imgfile)
-                plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-                predictions = DeepFace.analyze(img)
-                elapsedTimeInSecs = GetElapsedTimeFromImgName(filename)
-                result = (filename, elapsedTimeInSecs, predictions['dominant_emotion'])
+                imgObj = imageObject(imgfile)
+                faces = imgObj.getFaces()
+                imgNames = ''
+                expressions = ''
+
+                # TODO : check why face detection is failing
+                if len(faces) == 0 :
+                    print ("ERROR : Face detection failed for ",imgfile)
+                    expressions = expressions + ',' + "NA"
+                    imgNames = imgNames + ',' + "NA"
+
+                for face in faces :
+                    face.saveAsImage(dirpath)
+                    imgNames = imgNames + ',' + face.getName()
+                    expressions = expressions + ',' + face.getExpression()
+
+                elapsedTimeInSecs = GetElapsedTimeFromImgName(dirname)
+                result = (imgNames, elapsedTimeInSecs, expressions)
                 listOp.append(result)
+                index = index+1
         else:
             continue
     return listOp
