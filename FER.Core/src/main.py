@@ -32,6 +32,6 @@ if (not ret) :
     exit(0)
 
 from package.facerecognizer import *
-resultList = AnalyzeImage(imageOutputDir)
+resultList = AnalyzeImage(imageOutputDir, outputDirPath)
 outputFilePath = os.path.join(outputDirPath, "expression_output.json")
 WriteToOutputFile(resultList, outputFilePath)

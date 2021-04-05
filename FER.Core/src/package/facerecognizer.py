@@ -16,10 +16,10 @@ def GetElapsedTimeFromImgName(filename) :
 
     return tokens[1]
 
-def AnalyzeImage(imageDirectory) :
+def AnalyzeImage(imageDirectory, outputDirPath) :
     listOp = []
     print ("Process images files")
-    index = 0
+    fgenerateHelperImage = True
     for dirname in os.listdir(imageDirectory):
         dirpath = os.path.join(imageDirectory, dirname)
         if os.path.isdir(dirpath):
@@ -27,6 +27,9 @@ def AnalyzeImage(imageDirectory) :
             if (os.path.isfile(imgfile)) :
                 print("Processing : ---------------" + imgfile + "---------------------")
                 imgObj = imageObject(imgfile)
+                if (fgenerateHelperImage) :
+                    imgObj.generateFaceHelperImage(outputDirPath)
+                    fgenerateHelperImage = False
                 faces = imgObj.getFaces()
                 imgNames = ''
                 expressions = ''
@@ -45,7 +48,6 @@ def AnalyzeImage(imageDirectory) :
                 elapsedTimeInSecs = GetElapsedTimeFromImgName(dirname)
                 result = (imgNames, elapsedTimeInSecs, expressions)
                 listOp.append(result)
-                index = index+1
         else:
             continue
     return listOp
@@ -56,10 +58,22 @@ def WriteToOutputFile(listOp, outputFile) :
     data['Results'] = []
 
     for item in listOp :
+        imgnamelist = item[0].split(',')
+        exprlist = item[2].split(',')
+        assert(len(imgnamelist) == len(exprlist))
+        merged_list = [(imgnamelist[i], exprlist[i]) for i in range(0, len(imgnamelist))]
+        expr = []
+        for elem in merged_list :
+            if elem[0] == '' or elem[1] == '':
+                continue
+            expr.append({
+                'ImgName': elem[0],
+                'Expression':elem[1]
+            })
+
         data['Results'].append({
-            'ImgName': item[0],
             'TimeInSecs':item[1],
-            'Expression': item[2],
+            'Expressions': expr,
             })
 
     with open(outputFile, 'w') as outfile:
