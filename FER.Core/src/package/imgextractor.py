@@ -59,6 +59,7 @@ def CaptureFromVideo(videofile, outputDir, fersettings) :
     # frame 
     currentframe = 0
     currentSec = 0
+    currCount = 0
     while(True): 
         
         # reading from frame 
@@ -66,6 +67,7 @@ def CaptureFromVideo(videofile, outputDir, fersettings) :
     
         if ret: 
             # if video is still left continue creating images
+            currCount = currCount + 1
             name = 'frame_' + str(int(currentSec))
             imgdir = os.path.join(outputDir, name)
             if (not os.path.isdir(imgdir)) :
@@ -85,7 +87,7 @@ def CaptureFromVideo(videofile, outputDir, fersettings) :
         else: 
             break
 
-        if (currentframe == fersettings.FrameCaptureThrottleLimitPerVideo()) :
+        if (currCount == fersettings.FrameCaptureThrottleLimitPerVideo()) :
             break
     
     # Release all space and windows once done 

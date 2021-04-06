@@ -16,29 +16,39 @@ def GetElapsedTimeFromImgName(filename) :
 
     return tokens[1]
 
+def GetSortedDirectoryList(imgdir) :
+    dirnames = []
+    for dirname in os.listdir(imgdir):
+        tokens = dirname.split('_')
+        res = (dirname, int(tokens[1]))
+        dirnames.append(res)
+
+    dirnames.sort(key = lambda x: x[1])
+    return dirnames
+
 def AnalyzeImage(imageDirectory, outputDirPath) :
     listOp = []
     print ("Process images files")
-    fgenerateHelperImage = True
-    for dirname in os.listdir(imageDirectory):
+    fHelperImageGenerated = False
+    dirnames = GetSortedDirectoryList(imageDirectory)
+    for dirnameTup in dirnames:
+        dirname = dirnameTup[0]
         dirpath = os.path.join(imageDirectory, dirname)
         if os.path.isdir(dirpath):
             imgfile = os.path.join(dirpath, 'faces.jpg')
             if (os.path.isfile(imgfile)) :
                 print("Processing : ---------------" + imgfile + "---------------------")
                 imgObj = imageObject(imgfile)
-                if (fgenerateHelperImage) :
-                    imgObj.generateFaceHelperImage(outputDirPath)
-                    fgenerateHelperImage = False
+                if (not fHelperImageGenerated) :
+                    fHelperImageGenerated = imgObj.generateFaceHelperImage(outputDirPath)
                 faces = imgObj.getFaces()
                 imgNames = ''
                 expressions = ''
 
                 # TODO : check why face detection is failing
                 if len(faces) == 0 :
-                    print ("ERROR : Face detection failed for ",imgfile)
-                    expressions = expressions + ',' + "NA"
-                    imgNames = imgNames + ',' + "NA"
+                    print ("[WARNING] : No face detected in ",imgfile)
+                    continue
 
                 for face in faces :
                     face.saveAsImage(dirpath)

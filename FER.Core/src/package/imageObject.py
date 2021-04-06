@@ -35,9 +35,9 @@ class imageObject :
         faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
         faces = faceCascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=3, minSize=(30, 30))
 
-        print("[INFO] Found {0} Faces!".format(len(faces)))
-        #return faces, image
-        faceObjectList = []
+        if (len(faces) == 0) :
+            return False
+
         index = 1
         for (x, y, w, h) in faces :
             facename = 'face' + str(index)
@@ -49,6 +49,9 @@ class imageObject :
         status = cv2.imwrite(imgpath, image)
         if (not status) :
             print ("Failed to generate helper image.")
+            return False
+        
+        return True
 
 class faceObject :
     def __init__(self, faceimg, name) :

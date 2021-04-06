@@ -18,8 +18,7 @@ def GetOutputDirName(filepath) :
     dirPath = os.path.join(rootpath, dirName)
     return dirPath
 
-#res, videopath = "C:\\github\\FERClient\\data\\sample4.mp4"#GetVideoFilePathFromArgs(sys.argv)
-videopath = "C:\\github\\FERClient\\data\\sample4.mp4"#GetVideoFilePathFromArgs(sys.argv)
+res, videopath = GetVideoFilePathFromArgs(sys.argv) #"C:\\github\\FERClient\\data\\sample4.mp4"
 outputDirPath = GetOutputDirName(videopath)
 print(outputDirPath)
 
